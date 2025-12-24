@@ -447,7 +447,7 @@ export default function PainelFotos() {
               />
               <div className="top-content">
                 <h1>FILHOS DE SIÃO</h1>
-                <p>"Portanto ide, fazei discípulos de todas as nações, batizando-os em nome do Pai, e do Filho, e do Espírito Santo" — Mateus 28:19</p>
+                <p>&quot;Portanto ide, fazei discípulos de todas as nações, batizando-os em nome do Pai, e do Filho, e do Espírito Santo&quot; — Mateus 28:19</p>
               </div>
               <img
                 src="/escudos/escudo-direito.jpeg"

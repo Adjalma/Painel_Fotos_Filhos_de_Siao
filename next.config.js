@@ -5,12 +5,6 @@ const nextConfig = {
     domains: [],
     unoptimized: true,
   },
-  // Configuração para API routes
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
 }
 
 module.exports = nextConfig
