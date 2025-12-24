@@ -254,9 +254,21 @@ export default function PainelFotos() {
           position: relative;
           border: 6mm solid #FFFF00;
           box-sizing: border-box;
-          transform: scale(1);
+          transform: scale(0.85);
           transform-origin: top center;
           flex-shrink: 0;
+        }
+
+        @media (max-width: 1920px) {
+          #painel {
+            transform: scale(0.75);
+          }
+        }
+
+        @media (max-width: 1366px) {
+          #painel {
+            transform: scale(0.65);
+          }
         }
 
         .bg {
