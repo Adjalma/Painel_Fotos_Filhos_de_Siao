@@ -30,42 +30,18 @@ export default function PainelFotos() {
   const handleFileSelect = (index: number, file: File | null) => {
     if (!file) return;
 
+    // Usar FileReader para ler a imagem SEM processar - manter qualidade original
     const reader = new FileReader();
     reader.onload = (e) => {
-      // Carregar imagem em alta resolução
-      const img = new Image();
-      img.onload = () => {
-        // Criar canvas para manter qualidade
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          // Manter dimensões originais ou limitar a um máximo razoável
-          const maxWidth = 4000;
-          const maxHeight = 4000;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > maxWidth || height > maxHeight) {
-            const ratio = Math.min(maxWidth / width, maxHeight / height);
-            width = width * ratio;
-            height = height * ratio;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          const newFotos = [...fotos];
-          newFotos[index] = {
-            src: canvas.toDataURL('image/jpeg', 0.95),
-            file: file,
-          };
-          setFotos(newFotos);
-          mostrarMensagem('Foto adicionada com sucesso!', 'ok');
-        }
+      const newFotos = [...fotos];
+      newFotos[index] = {
+        src: e.target?.result as string, // Usar imagem original diretamente
+        file: file,
       };
-      img.src = e.target?.result as string;
+      setFotos(newFotos);
+      mostrarMensagem('Foto adicionada com sucesso!', 'ok');
     };
+    // Ler como DataURL mantendo qualidade máxima
     reader.readAsDataURL(file);
   };
 
@@ -111,39 +87,61 @@ export default function PainelFotos() {
         (btn as HTMLElement).style.display = 'none';
       });
 
-      // Garantir que todas as imagens estejam carregadas antes de capturar
+      // Criar clone do painel em tamanho real para captura
       const painelElement = painelRef.current;
-      const images = painelElement.querySelectorAll('img');
+      const clone = painelElement.cloneNode(true) as HTMLElement;
+      
+      // Configurar clone para captura em tamanho real A2
+      clone.style.position = 'fixed';
+      clone.style.left = '-9999px';
+      clone.style.top = '0';
+      clone.style.transform = 'scale(1)';
+      clone.style.width = '594mm';
+      clone.style.height = '420mm';
+      clone.style.border = '6mm solid #FFFF00';
+      document.body.appendChild(clone);
+
+      // Garantir que todas as imagens estejam carregadas
+      const images = clone.querySelectorAll('img');
       const imagePromises = Array.from(images).map((img) => {
-        if (img.complete) return Promise.resolve();
+        const imgEl = img as HTMLImageElement;
+        if (imgEl.complete && imgEl.naturalWidth > 0) return Promise.resolve();
         return new Promise((resolve) => {
-          img.onload = resolve;
-          img.onerror = resolve;
+          imgEl.onload = resolve;
+          imgEl.onerror = resolve;
+          // Timeout de segurança
+          setTimeout(resolve, 5000);
         });
       });
       
       await Promise.all(imagePromises);
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Capturar o painel em tamanho real A2 com MÁXIMA qualidade
-      const canvas = await html2canvas(painelElement, {
-        scale: 5,
+      // Capturar o clone em tamanho real A2 com MÁXIMA qualidade
+      const canvas = await html2canvas(clone, {
+        scale: 4,
         useCORS: true,
         logging: false,
         backgroundColor: '#fff',
-        width: painelElement.offsetWidth,
-        height: painelElement.offsetHeight,
-        allowTaint: false,
+        width: clone.offsetWidth,
+        height: clone.offsetHeight,
+        allowTaint: true,
         removeContainer: false,
-        imageTimeout: 15000,
+        imageTimeout: 20000,
         onclone: (clonedDoc) => {
-          // Garantir que imagens no clone também estejam em alta qualidade
+          // Garantir que imagens no clone mantenham qualidade
           const clonedImages = clonedDoc.querySelectorAll('img');
           clonedImages.forEach((img) => {
-            (img as HTMLImageElement).style.imageRendering = 'high-quality';
+            const imgEl = img as HTMLImageElement;
+            imgEl.style.imageRendering = 'auto';
+            imgEl.style.maxWidth = 'none';
+            imgEl.style.maxHeight = 'none';
           });
         },
       });
+
+      // Remover clone
+      document.body.removeChild(clone);
 
       // Criar PDF A2 em paisagem (594mm x 420mm)
       const pdf = new jsPDF({
@@ -153,11 +151,15 @@ export default function PainelFotos() {
         compress: false,
       });
 
-      // Usar qualidade máxima no JPEG
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      // Calcular dimensões exatas do canvas em mm
+      const canvasWidthMM = (canvas.width / 4) * 0.264583; // converter pixels para mm (scale 4)
+      const canvasHeightMM = (canvas.height / 4) * 0.264583;
       
-      // Adicionar imagem ao PDF preenchendo todo o A2
-      pdf.addImage(imgData, 'JPEG', 0, 0, 594, 420, undefined, 'FAST');
+      // Usar qualidade máxima no PNG para melhor qualidade
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      
+      // Adicionar imagem ao PDF preenchendo TODO o espaço A2 (594mm x 420mm)
+      pdf.addImage(imgData, 'PNG', 0, 0, 594, 420, undefined, 'FAST');
 
       // Salvar PDF
       pdf.save(`Painel_Filhos_de_Siao_${Date.now()}.pdf`);
@@ -412,12 +414,10 @@ export default function PainelFotos() {
         .foto img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           object-position: center;
           display: block;
-          image-rendering: -webkit-optimize-contrast;
-          image-rendering: crisp-edges;
-          image-rendering: high-quality;
+          image-rendering: auto;
           -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
           transform: translateZ(0);
