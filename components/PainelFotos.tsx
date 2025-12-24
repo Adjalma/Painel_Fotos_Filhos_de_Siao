@@ -74,10 +74,10 @@ export default function PainelFotos() {
     }
 
     setGerando(true);
-    mostrarMensagem('Gerando PDF...', 'ok');
+    mostrarMensagem('Gerando PDF com qualidade máxima...', 'ok');
 
     try {
-      // Carregar html2canvas e jspdf dinamicamente
+      // Carregar bibliotecas dinamicamente
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
@@ -87,9 +87,15 @@ export default function PainelFotos() {
         (btn as HTMLElement).style.display = 'none';
       });
 
-      // Criar clone do painel em tamanho real para captura
+      // Criar clone do painel SEM as fotos para capturar apenas o layout
       const painelElement = painelRef.current;
       const clone = painelElement.cloneNode(true) as HTMLElement;
+      
+      // Remover imagens das fotos do clone (manter apenas escudos)
+      const fotoImages = clone.querySelectorAll('.foto img');
+      fotoImages.forEach((img) => {
+        img.remove();
+      });
       
       // Configurar clone para captura em tamanho real A2
       clone.style.position = 'fixed';
@@ -101,43 +107,17 @@ export default function PainelFotos() {
       clone.style.border = '6mm solid #FFFF00';
       document.body.appendChild(clone);
 
-      // Garantir que todas as imagens estejam carregadas
-      const images = clone.querySelectorAll('img');
-      const imagePromises = Array.from(images).map((img) => {
-        const imgEl = img as HTMLImageElement;
-        if (imgEl.complete && imgEl.naturalWidth > 0) return Promise.resolve();
-        return new Promise((resolve) => {
-          imgEl.onload = resolve;
-          imgEl.onerror = resolve;
-          // Timeout de segurança
-          setTimeout(resolve, 5000);
-        });
-      });
-      
-      await Promise.all(imagePromises);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Capturar o clone em tamanho real A2 com MÁXIMA qualidade
-      const canvas = await html2canvas(clone, {
-        scale: 4,
+      // Capturar apenas o layout (sem fotos) em alta qualidade
+      const layoutCanvas = await html2canvas(clone, {
+        scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: '#fff',
         width: clone.offsetWidth,
         height: clone.offsetHeight,
         allowTaint: true,
-        removeContainer: false,
-        imageTimeout: 20000,
-        onclone: (clonedDoc) => {
-          // Garantir que imagens no clone mantenham qualidade
-          const clonedImages = clonedDoc.querySelectorAll('img');
-          clonedImages.forEach((img) => {
-            const imgEl = img as HTMLImageElement;
-            imgEl.style.imageRendering = 'auto';
-            imgEl.style.maxWidth = 'none';
-            imgEl.style.maxHeight = 'none';
-          });
-        },
       });
 
       // Remover clone
@@ -151,20 +131,92 @@ export default function PainelFotos() {
         compress: false,
       });
 
-      // Calcular dimensões exatas do canvas em mm
-      const canvasWidthMM = (canvas.width / 4) * 0.264583; // converter pixels para mm (scale 4)
-      const canvasHeightMM = (canvas.height / 4) * 0.264583;
+      // Adicionar layout ao PDF
+      const layoutData = layoutCanvas.toDataURL('image/png', 1.0);
+      pdf.addImage(layoutData, 'PNG', 0, 0, 594, 420, undefined, 'FAST');
+
+      // Obter posições das fotos no painel
+      const fotoElements = painelElement.querySelectorAll('.foto');
+      const fotoPositions: Array<{ x: number; y: number; width: number; height: number; src: string }> = [];
       
-      // Usar qualidade máxima no PNG para melhor qualidade
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      
-      // Adicionar imagem ao PDF preenchendo TODO o espaço A2 (594mm x 420mm)
-      pdf.addImage(imgData, 'PNG', 0, 0, 594, 420, undefined, 'FAST');
+      fotoElements.forEach((foto, index) => {
+        const rect = foto.getBoundingClientRect();
+        const painelRect = painelElement.getBoundingClientRect();
+        
+        // Calcular posição relativa ao painel em mm
+        const x = ((rect.left - painelRect.left) / painelRect.width) * 594;
+        const y = ((rect.top - painelRect.top) / painelRect.height) * 420;
+        const width = (rect.width / painelRect.width) * 594;
+        const height = (rect.height / painelRect.height) * 420;
+        
+        if (fotos[index]?.src) {
+          fotoPositions.push({
+            x: x + 6, // ajuste para borda
+            y: y + 6,
+            width: width - 12, // ajuste para bordas
+            height: height - 12,
+            src: fotos[index].src,
+          });
+        }
+      });
+
+      // Carregar e inserir cada foto ORIGINAL diretamente no PDF
+      for (const foto of fotoPositions) {
+        try {
+          const img = new Image();
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = foto.src;
+          });
+
+          // Criar canvas temporário para a foto em alta qualidade
+          const fotoCanvas = document.createElement('canvas');
+          const ctx = fotoCanvas.getContext('2d', { alpha: false });
+          if (ctx) {
+            // Manter qualidade original ou limitar a 300 DPI
+            const maxDPI = 300;
+            const mmToPx = maxDPI / 25.4;
+            const canvasWidth = Math.round(foto.width * mmToPx);
+            const canvasHeight = Math.round(foto.height * mmToPx);
+            
+            fotoCanvas.width = canvasWidth;
+            fotoCanvas.height = canvasHeight;
+            
+            // Desenhar imagem mantendo proporção
+            const imgAspect = img.width / img.height;
+            const canvasAspect = canvasWidth / canvasHeight;
+            
+            let drawWidth = canvasWidth;
+            let drawHeight = canvasHeight;
+            let drawX = 0;
+            let drawY = 0;
+            
+            if (imgAspect > canvasAspect) {
+              drawHeight = canvasWidth / imgAspect;
+              drawY = (canvasHeight - drawHeight) / 2;
+            } else {
+              drawWidth = canvasHeight * imgAspect;
+              drawX = (canvasWidth - drawWidth) / 2;
+            }
+            
+            ctx.fillStyle = '#f9f9f9';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+            
+            // Adicionar foto ao PDF em qualidade máxima
+            const fotoData = fotoCanvas.toDataURL('image/png', 1.0);
+            pdf.addImage(fotoData, 'PNG', foto.x, foto.y, foto.width, foto.height, undefined, 'FAST');
+          }
+        } catch (error) {
+          console.warn(`Erro ao processar foto:`, error);
+        }
+      }
 
       // Salvar PDF
       pdf.save(`Painel_Filhos_de_Siao_${Date.now()}.pdf`);
 
-      mostrarMensagem('PDF gerado com sucesso!', 'ok');
+      mostrarMensagem('PDF gerado com sucesso em qualidade máxima!', 'ok');
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       mostrarMensagem('Erro ao gerar PDF. Tente novamente.', 'err');
