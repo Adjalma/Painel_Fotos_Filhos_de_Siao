@@ -85,48 +85,34 @@ export default function PainelFotos() {
         (btn as HTMLElement).style.display = 'none';
       });
 
-      // Criar um clone do painel em tamanho real para captura
+      // Capturar o painel diretamente em tamanho real A2
       const painelElement = painelRef.current;
-      const clone = painelElement.cloneNode(true) as HTMLElement;
       
-      // Configurar clone para captura em alta qualidade
-      clone.style.position = 'fixed';
-      clone.style.left = '-9999px';
-      clone.style.top = '0';
-      clone.style.transform = 'scale(1)';
-      clone.style.width = '297mm';
-      clone.style.height = '210mm';
-      clone.style.border = '4mm solid #FFFF00';
-      document.body.appendChild(clone);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      await new Promise((resolve) => setTimeout(resolve, 600));
-
-      // Capturar o clone em tamanho real A4 com alta qualidade
-      const canvas = await html2canvas(clone, {
-        scale: 4,
+      // Capturar o painel em tamanho real A2 com alta qualidade
+      const canvas = await html2canvas(painelElement, {
+        scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: '#fff',
-        width: clone.offsetWidth,
-        height: clone.offsetHeight,
+        width: painelElement.offsetWidth,
+        height: painelElement.offsetHeight,
         allowTaint: false,
         removeContainer: false,
       });
 
-      // Remover clone
-      document.body.removeChild(clone);
-
-      // Criar PDF A4 em paisagem (297mm x 210mm)
+      // Criar PDF A2 em paisagem (594mm x 420mm)
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: 'a4',
+        format: 'a2',
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
-      // Adicionar imagem ao PDF preenchendo todo o A4
-      pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
+      // Adicionar imagem ao PDF preenchendo todo o A2
+      pdf.addImage(imgData, 'JPEG', 0, 0, 594, 420);
 
       // Salvar PDF
       pdf.save(`Painel_Filhos_de_Siao_${Date.now()}.pdf`);
@@ -213,31 +199,19 @@ export default function PainelFotos() {
         }
 
         #painel {
-          width: 297mm;
-          height: 210mm;
-          min-width: 297mm;
-          min-height: 210mm;
-          max-width: 297mm;
-          max-height: 210mm;
+          width: 594mm;
+          height: 420mm;
+          min-width: 594mm;
+          min-height: 420mm;
+          max-width: 594mm;
+          max-height: 420mm;
           background: white;
           position: relative;
-          border: 4mm solid #FFFF00;
+          border: 6mm solid #FFFF00;
           box-sizing: border-box;
-          transform: scale(0.35);
+          transform: scale(1);
           transform-origin: top center;
           flex-shrink: 0;
-        }
-
-        @media (max-width: 1920px) {
-          #painel {
-            transform: scale(0.22);
-          }
-        }
-
-        @media (max-width: 1366px) {
-          #painel {
-            transform: scale(0.18);
-          }
         }
 
         .bg {
@@ -295,13 +269,13 @@ export default function PainelFotos() {
 
         .top {
           background: #FFFF00;
-          padding: 10mm 75mm 10mm 75mm;
+          padding: 20mm 150mm 20mm 150mm;
           text-align: center;
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 65mm;
+          height: 130mm;
           box-sizing: border-box;
         }
 
@@ -312,8 +286,8 @@ export default function PainelFotos() {
         }
 
         .escudo {
-          width: 35mm;
-          height: 35mm;
+          width: 70mm;
+          height: 70mm;
           object-fit: contain;
           position: absolute;
           top: 50%;
@@ -322,42 +296,42 @@ export default function PainelFotos() {
         }
 
         .escudo-esquerdo {
-          left: 6mm;
+          left: 12mm;
         }
 
         .escudo-direito {
-          right: 6mm;
+          right: 12mm;
         }
 
         .top h1 {
-          font-size: 28pt;
-          margin: 0 0 5mm 0;
+          font-size: 48pt;
+          margin: 0 0 10mm 0;
           font-weight: 900;
         }
 
         .top p {
-          font-size: 16pt;
+          font-size: 28pt;
           font-style: italic;
           line-height: 1.3;
           font-weight: bold;
           margin: 0;
-          padding: 0 10mm;
+          padding: 0 20mm;
         }
 
         .grid {
-          height: calc(210mm - 65mm);
-          padding: 8mm 10mm;
+          height: calc(420mm - 130mm);
+          padding: 24mm 30mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
           grid-template-rows: 1fr 1.5fr 1fr;
-          gap: 5mm;
+          gap: 15mm;
           box-sizing: border-box;
           overflow: hidden;
         }
 
         .foto {
-          border: 2mm solid #ddd;
-          border-radius: 4mm;
+          border: 6mm solid #ddd;
+          border-radius: 12mm;
           background: #f9f9f9;
           position: relative;
           cursor: pointer;
@@ -396,28 +370,28 @@ export default function PainelFotos() {
           align-items: center;
           justify-content: center;
           color: #aaa;
-          font-size: 14pt;
+          font-size: 32pt;
           font-weight: bold;
         }
 
         .ph svg {
-          width: 40mm;
-          height: 40mm;
-          margin-bottom: 5mm;
+          width: 120mm;
+          height: 120mm;
+          margin-bottom: 15mm;
           opacity: 0.4;
         }
 
         .rm {
           position: absolute;
-          top: 5mm;
-          right: 5mm;
-          width: 20mm;
-          height: 20mm;
+          top: 15mm;
+          right: 15mm;
+          width: 60mm;
+          height: 60mm;
           background: rgba(220, 53, 69, 0.9);
           color: white;
           border: none;
           border-radius: 50%;
-          font-size: 16pt;
+          font-size: 48pt;
           cursor: pointer;
           display: none;
           align-items: center;
@@ -469,7 +443,7 @@ export default function PainelFotos() {
           onClick={handleGerarPDF}
           disabled={gerando}
         >
-          {gerando ? 'GERANDO PDF...' : 'GERAR PDF A3'}
+          {gerando ? 'GERANDO PDF...' : 'GERAR PDF A2'}
         </button>
         <button className="btn btn-secondary" id="clr" onClick={handleLimpar}>
           LIMPAR
