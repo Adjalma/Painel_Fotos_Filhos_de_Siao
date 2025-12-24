@@ -88,26 +88,38 @@ export default function PainelFotos() {
       // Remover scale temporariamente para captura em tamanho real
       const painelElement = painelRef.current;
       const originalTransform = painelElement.style.transform;
+      const originalPosition = painelElement.style.position;
+      const originalLeft = painelElement.style.left;
+      
+      // Aplicar tamanho real para captura
       painelElement.style.transform = 'scale(1)';
-      painelElement.style.position = 'absolute';
-      painelElement.style.left = '-9999px';
+      painelElement.style.position = 'fixed';
+      painelElement.style.left = '0';
+      painelElement.style.top = '0';
+      painelElement.style.width = '420mm';
+      painelElement.style.height = '297mm';
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      // Capturar o painel como canvas em tamanho real A3
+      // Capturar o painel como canvas em tamanho real A3 com alta qualidade
       const canvas = await html2canvas(painelElement, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: '#fff',
-        width: painelElement.offsetWidth,
-        height: painelElement.offsetHeight,
+        width: 420 * 3.779527559, // 420mm em pixels
+        height: 297 * 3.779527559, // 297mm em pixels
+        windowWidth: 420 * 3.779527559,
+        windowHeight: 297 * 3.779527559,
       });
 
       // Restaurar transformação original
       painelElement.style.transform = originalTransform;
-      painelElement.style.position = 'relative';
-      painelElement.style.left = '';
+      painelElement.style.position = originalPosition;
+      painelElement.style.left = originalLeft;
+      painelElement.style.width = '';
+      painelElement.style.height = '';
+      painelElement.style.top = '';
 
       // Criar PDF A3 em paisagem (420mm x 297mm)
       const pdf = new jsPDF({
@@ -281,7 +293,7 @@ export default function PainelFotos() {
 
         .top {
           background: #FFFF00;
-          padding: 20mm 120mm 20mm 120mm;
+          padding: 15mm 100mm 15mm 100mm;
           text-align: center;
           position: relative;
           display: flex;
@@ -296,8 +308,8 @@ export default function PainelFotos() {
         }
 
         .escudo {
-          width: 50mm;
-          height: 50mm;
+          width: 45mm;
+          height: 45mm;
           object-fit: contain;
           position: absolute;
           top: 50%;
@@ -306,40 +318,40 @@ export default function PainelFotos() {
         }
 
         .escudo-esquerdo {
-          left: 15mm;
+          left: 10mm;
         }
 
         .escudo-direito {
-          right: 15mm;
+          right: 10mm;
         }
 
         .top h1 {
-          font-size: 28pt;
-          margin: 0 0 6mm 0;
+          font-size: 26pt;
+          margin: 0 0 5mm 0;
           font-weight: 900;
         }
 
         .top p {
-          font-size: 14pt;
+          font-size: 13pt;
           font-style: italic;
-          line-height: 1.3;
+          line-height: 1.2;
           font-weight: bold;
           margin: 0;
-          padding: 0 5mm;
+          padding: 0 10mm;
         }
 
         .grid {
           flex: 1;
-          padding: 25mm;
+          padding: 12mm 15mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 1fr 1.2fr 1fr;
-          gap: 15mm;
+          grid-template-rows: 1fr 1.3fr 1fr;
+          gap: 8mm;
         }
 
         .foto {
-          border: 3mm solid #ddd;
-          border-radius: 6mm;
+          border: 2mm solid #ddd;
+          border-radius: 4mm;
           background: #f9f9f9;
           position: relative;
           cursor: pointer;
