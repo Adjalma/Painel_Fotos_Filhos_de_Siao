@@ -85,41 +85,34 @@ export default function PainelFotos() {
         (btn as HTMLElement).style.display = 'none';
       });
 
-      // Remover scale temporariamente para captura em tamanho real
+      // Criar um clone do painel em tamanho real para captura
       const painelElement = painelRef.current;
-      const originalTransform = painelElement.style.transform;
-      const originalPosition = painelElement.style.position;
-      const originalLeft = painelElement.style.left;
+      const clone = painelElement.cloneNode(true) as HTMLElement;
       
-      // Aplicar tamanho real para captura
-      painelElement.style.transform = 'scale(1)';
-      painelElement.style.position = 'fixed';
-      painelElement.style.left = '0';
-      painelElement.style.top = '0';
-      painelElement.style.width = '420mm';
-      painelElement.style.height = '297mm';
+      // Configurar clone para captura
+      clone.style.position = 'fixed';
+      clone.style.left = '-9999px';
+      clone.style.top = '0';
+      clone.style.transform = 'scale(1)';
+      clone.style.width = '420mm';
+      clone.style.height = '297mm';
+      clone.style.border = '5mm solid #FFFF00';
+      document.body.appendChild(clone);
 
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Capturar o painel como canvas em tamanho real A3 com alta qualidade
-      const canvas = await html2canvas(painelElement, {
-        scale: 3,
+      // Capturar o clone em tamanho real A3
+      const canvas = await html2canvas(clone, {
+        scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#fff',
-        width: 420 * 3.779527559, // 420mm em pixels
-        height: 297 * 3.779527559, // 297mm em pixels
-        windowWidth: 420 * 3.779527559,
-        windowHeight: 297 * 3.779527559,
+        width: clone.offsetWidth,
+        height: clone.offsetHeight,
       });
 
-      // Restaurar transformação original
-      painelElement.style.transform = originalTransform;
-      painelElement.style.position = originalPosition;
-      painelElement.style.left = originalLeft;
-      painelElement.style.width = '';
-      painelElement.style.height = '';
-      painelElement.style.top = '';
+      // Remover clone
+      document.body.removeChild(clone);
 
       // Criar PDF A3 em paisagem (420mm x 297mm)
       const pdf = new jsPDF({
@@ -211,30 +204,37 @@ export default function PainelFotos() {
         .wrap {
           display: flex;
           justify-content: center;
+          align-items: flex-start;
           overflow: auto;
           padding: 20px;
+          max-height: calc(100vh - 200px);
         }
 
         #painel {
           width: 420mm;
           height: 297mm;
+          min-width: 420mm;
+          min-height: 297mm;
+          max-width: 420mm;
+          max-height: 297mm;
           background: white;
           position: relative;
-          border: 8mm solid #FFFF00;
+          border: 5mm solid #FFFF00;
           box-sizing: border-box;
-          transform: scale(0.4);
+          transform: scale(0.25);
           transform-origin: top center;
+          flex-shrink: 0;
         }
 
         @media (max-width: 1920px) {
           #painel {
-            transform: scale(0.35);
+            transform: scale(0.22);
           }
         }
 
         @media (max-width: 1366px) {
           #painel {
-            transform: scale(0.3);
+            transform: scale(0.18);
           }
         }
 
@@ -293,12 +293,14 @@ export default function PainelFotos() {
 
         .top {
           background: #FFFF00;
-          padding: 15mm 100mm 15mm 100mm;
+          padding: 12mm 90mm 12mm 90mm;
           text-align: center;
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
+          height: 80mm;
+          box-sizing: border-box;
         }
 
         .top-content {
@@ -308,8 +310,8 @@ export default function PainelFotos() {
         }
 
         .escudo {
-          width: 45mm;
-          height: 45mm;
+          width: 40mm;
+          height: 40mm;
           object-fit: contain;
           position: absolute;
           top: 50%;
@@ -318,35 +320,37 @@ export default function PainelFotos() {
         }
 
         .escudo-esquerdo {
-          left: 10mm;
+          left: 8mm;
         }
 
         .escudo-direito {
-          right: 10mm;
+          right: 8mm;
         }
 
         .top h1 {
-          font-size: 26pt;
-          margin: 0 0 5mm 0;
+          font-size: 24pt;
+          margin: 0 0 4mm 0;
           font-weight: 900;
         }
 
         .top p {
-          font-size: 13pt;
+          font-size: 12pt;
           font-style: italic;
           line-height: 1.2;
           font-weight: bold;
           margin: 0;
-          padding: 0 10mm;
+          padding: 0 15mm;
         }
 
         .grid {
-          flex: 1;
-          padding: 12mm 15mm;
+          height: calc(297mm - 80mm);
+          padding: 10mm 12mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 1fr 1.3fr 1fr;
-          gap: 8mm;
+          grid-template-rows: 1fr 1.4fr 1fr;
+          gap: 6mm;
+          box-sizing: border-box;
+          overflow: hidden;
         }
 
         .foto {
@@ -356,6 +360,12 @@ export default function PainelFotos() {
           position: relative;
           cursor: pointer;
           overflow: hidden;
+          width: 100%;
+          height: 100%;
+          min-height: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .foto.mid {
@@ -369,7 +379,8 @@ export default function PainelFotos() {
         .foto img {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
+          display: block;
         }
 
         .ph {
@@ -494,7 +505,7 @@ export default function PainelFotos() {
               />
               <div className="top-content">
                 <h1>FILHOS DE SIÃO</h1>
-                <p>&quot;Portanto ide, fazei discípulos de todas as nações, batizando-os em nome do Pai, e do Filho, e do Espírito Santo&quot; — Mateus 28:19</p>
+                <p>Quero trazer à memória o que me pode dar esperança — Lamentações 3:21</p>
               </div>
               <img
                 src="/escudos/escudo-direito.jpeg"
