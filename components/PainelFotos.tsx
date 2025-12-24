@@ -85,17 +85,29 @@ export default function PainelFotos() {
         (btn as HTMLElement).style.display = 'none';
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      // Remover scale temporariamente para captura em tamanho real
+      const painelElement = painelRef.current;
+      const originalTransform = painelElement.style.transform;
+      painelElement.style.transform = 'scale(1)';
+      painelElement.style.position = 'absolute';
+      painelElement.style.left = '-9999px';
 
-      // Capturar o painel como canvas
-      const canvas = await html2canvas(painelRef.current, {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Capturar o painel como canvas em tamanho real A3
+      const canvas = await html2canvas(painelElement, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#fff',
-        width: painelRef.current.offsetWidth,
-        height: painelRef.current.offsetHeight,
+        width: painelElement.offsetWidth,
+        height: painelElement.offsetHeight,
       });
+
+      // Restaurar transformação original
+      painelElement.style.transform = originalTransform;
+      painelElement.style.position = 'relative';
+      painelElement.style.left = '';
 
       // Criar PDF A3 em paisagem (420mm x 297mm)
       const pdf = new jsPDF({
@@ -139,6 +151,9 @@ export default function PainelFotos() {
           font-family: Arial, sans-serif;
           padding: 20px;
           background: #2c3e50;
+          border: 10px solid #FFFF00;
+          min-height: 100vh;
+          box-sizing: border-box;
         }
 
         .controls {
@@ -185,6 +200,7 @@ export default function PainelFotos() {
           display: flex;
           justify-content: center;
           overflow: auto;
+          padding: 20px;
         }
 
         #painel {
@@ -192,6 +208,22 @@ export default function PainelFotos() {
           height: 297mm;
           background: white;
           position: relative;
+          border: 8mm solid #FFFF00;
+          box-sizing: border-box;
+          transform: scale(0.4);
+          transform-origin: top center;
+        }
+
+        @media (max-width: 1920px) {
+          #painel {
+            transform: scale(0.35);
+          }
+        }
+
+        @media (max-width: 1366px) {
+          #painel {
+            transform: scale(0.3);
+          }
         }
 
         .bg {
@@ -249,48 +281,51 @@ export default function PainelFotos() {
 
         .top {
           background: #FFFF00;
-          padding: 25mm 30mm;
+          padding: 20mm 120mm 20mm 120mm;
           text-align: center;
           position: relative;
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: center;
         }
 
         .top-content {
           flex: 1;
           text-align: center;
+          z-index: 2;
         }
 
         .escudo {
-          width: 60mm;
-          height: 60mm;
+          width: 50mm;
+          height: 50mm;
           object-fit: contain;
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
+          z-index: 1;
         }
 
         .escudo-esquerdo {
-          left: 20mm;
+          left: 15mm;
         }
 
         .escudo-direito {
-          right: 20mm;
+          right: 15mm;
         }
 
         .top h1 {
           font-size: 28pt;
-          margin: 0 0 8mm 0;
+          margin: 0 0 6mm 0;
           font-weight: 900;
         }
 
         .top p {
-          font-size: 16pt;
+          font-size: 14pt;
           font-style: italic;
-          line-height: 1.4;
+          line-height: 1.3;
           font-weight: bold;
           margin: 0;
+          padding: 0 5mm;
         }
 
         .grid {
