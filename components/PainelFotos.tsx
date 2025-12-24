@@ -139,22 +139,39 @@ export default function PainelFotos() {
       const fotoElements = painelElement.querySelectorAll('.foto');
       const fotoPositions: Array<{ x: number; y: number; width: number; height: number; src: string }> = [];
       
+      // Obter dimensões reais do painel em mm
+      const painelWidthMM = 594;
+      const painelHeightMM = 420;
+      const topHeightMM = 100; // altura da área amarela
+      const gridPaddingMM = 20; // padding do grid
+      const gridGapMM = 10; // gap entre fotos
+      const fotoBorderMM = 4; // borda das fotos
+      
+      // Calcular dimensões do grid
+      const gridWidthMM = painelWidthMM - (gridPaddingMM * 2);
+      const gridHeightMM = painelHeightMM - topHeightMM - (gridPaddingMM * 2);
+      
+      // Calcular tamanho das fotos no grid
+      const fotoWidthSmall = (gridWidthMM - (gridGapMM * 2)) / 3;
+      const fotoHeightSmall = (gridHeightMM - (gridGapMM * 2) - (gridHeightMM * 0.6 / 1.6)) / 2;
+      const fotoHeightLarge = gridHeightMM * 0.6;
+      
       fotoElements.forEach((foto, index) => {
         const rect = foto.getBoundingClientRect();
         const painelRect = painelElement.getBoundingClientRect();
         
-        // Calcular posição relativa ao painel em mm
-        const x = ((rect.left - painelRect.left) / painelRect.width) * 594;
-        const y = ((rect.top - painelRect.top) / painelRect.height) * 420;
-        const width = (rect.width / painelRect.width) * 594;
-        const height = (rect.height / painelRect.height) * 420;
+        // Calcular posição relativa ao painel em mm (mais preciso)
+        const x = ((rect.left - painelRect.left) / painelRect.width) * painelWidthMM;
+        const y = ((rect.top - painelRect.top) / painelRect.height) * painelHeightMM;
+        const width = (rect.width / painelRect.width) * painelWidthMM;
+        const height = (rect.height / painelRect.height) * painelHeightMM;
         
         if (fotos[index]?.src) {
           fotoPositions.push({
-            x: x + 6, // ajuste para borda
-            y: y + 6,
-            width: width - 12, // ajuste para bordas
-            height: height - 12,
+            x: x + fotoBorderMM, // ajuste para borda interna
+            y: y + fotoBorderMM,
+            width: width - (fotoBorderMM * 2), // remover bordas
+            height: height - (fotoBorderMM * 2),
             src: fotos[index].src,
           });
         }
@@ -174,8 +191,8 @@ export default function PainelFotos() {
           const fotoCanvas = document.createElement('canvas');
           const ctx = fotoCanvas.getContext('2d', { alpha: false });
           if (ctx) {
-            // Manter qualidade original ou limitar a 300 DPI
-            const maxDPI = 300;
+            // Aumentar DPI para melhor qualidade em fotos maiores (350 DPI)
+            const maxDPI = 350;
             const mmToPx = maxDPI / 25.4;
             const canvasWidth = Math.round(foto.width * mmToPx);
             const canvasHeight = Math.round(foto.height * mmToPx);
@@ -380,13 +397,13 @@ export default function PainelFotos() {
 
         .top {
           background: #FFFF00;
-          padding: 20mm 150mm 20mm 150mm;
+          padding: 15mm 120mm 15mm 120mm;
           text-align: center;
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 130mm;
+          height: 100mm;
           box-sizing: border-box;
         }
 
@@ -430,19 +447,19 @@ export default function PainelFotos() {
         }
 
         .grid {
-          height: calc(420mm - 130mm);
-          padding: 24mm 30mm;
+          height: calc(420mm - 100mm);
+          padding: 15mm 20mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 1fr 1.5fr 1fr;
-          gap: 15mm;
+          grid-template-rows: 1fr 1.6fr 1fr;
+          gap: 10mm;
           box-sizing: border-box;
           overflow: hidden;
         }
 
         .foto {
-          border: 6mm solid #ddd;
-          border-radius: 12mm;
+          border: 4mm solid #ddd;
+          border-radius: 8mm;
           background: #f9f9f9;
           position: relative;
           cursor: pointer;
