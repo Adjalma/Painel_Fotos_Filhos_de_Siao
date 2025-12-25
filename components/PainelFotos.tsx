@@ -197,9 +197,11 @@ export default function PainelFotos() {
         const containerHeight = (containerRect.height / painelRect.height) * 420;
         
         // Área disponível para foto (sem espaço do texto)
-        const textoHeight = 20; // altura aproximada da caixa de texto em mm
+        // Para foto central (index 3), usar mais espaço para texto
+        const textoHeight = index === 3 ? 25 : 20; // foto central precisa de mais espaço
+        const marginTopTexto = index === 3 ? 6 : 4; // mais espaçamento para foto central
         const fotoAreaWidth = containerWidth;
-        const fotoAreaHeight = containerHeight - textoHeight - 4; // 4mm de margin-top
+        const fotoAreaHeight = containerHeight - textoHeight - marginTopTexto;
         
         // Aumentar área da foto em 25% (usando toda a área disponível)
         const widthIncrease = fotoAreaWidth * 0.25;
@@ -516,7 +518,7 @@ export default function PainelFotos() {
           padding: 8mm 12mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 1fr 1.6fr 1fr;
+          grid-template-rows: 1fr 1.4fr 1fr;
           gap: 5mm;
           box-sizing: border-box;
           overflow: visible;
