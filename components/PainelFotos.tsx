@@ -166,14 +166,20 @@ export default function PainelFotos() {
         compress: false,
       });
 
-      // Desenhar borda amarela diretamente no PDF (6mm)
+      // Desenhar borda amarela diretamente no PDF ANTES do layout (6mm)
       pdf.setDrawColor(255, 244, 79); // #FFF44F
       pdf.setLineWidth(6);
-      pdf.rect(0, 0, 594, 420, 'S'); // Desenhar retângulo como borda
+      // Desenhar borda externa completa
+      pdf.rect(0, 0, 594, 420, 'S'); // Borda externa completa
 
       // Adicionar layout ao PDF (sem borda, pois já desenhamos)
       const layoutData = layoutCanvas.toDataURL('image/png', 1.0);
       pdf.addImage(layoutData, 'PNG', 0, 0, 594, 420, undefined, 'FAST');
+      
+      // Redesenhar borda amarela POR CIMA do layout para garantir visibilidade
+      pdf.setDrawColor(255, 244, 79);
+      pdf.setLineWidth(6);
+      pdf.rect(0, 0, 594, 420, 'S'); // Redesenhar borda por cima
 
       // Obter posições das fotos no painel (usando .foto-container para pegar todas as 7)
       const fotoContainers = painelElement.querySelectorAll('.foto-container');
