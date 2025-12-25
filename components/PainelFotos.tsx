@@ -507,16 +507,16 @@ export default function PainelFotos() {
         .foto-texto {
           width: 100%;
           margin-top: 2mm;
-          padding: 2mm;
+          padding: 3mm;
           border: 1mm solid #ddd;
           border-radius: 3mm;
           background: white;
-          font-size: 9pt;
+          font-size: 14pt;
           font-family: Arial, sans-serif;
           text-align: center;
           resize: none;
-          min-height: 12mm;
-          max-height: 30mm;
+          min-height: 15mm;
+          max-height: 35mm;
           overflow-y: auto;
           word-wrap: break-word;
           flex-shrink: 0;
