@@ -516,7 +516,7 @@ export default function PainelFotos() {
 
         .foto-texto {
           width: 100%;
-          margin-top: 2mm;
+          margin-top: 4mm;
           padding: 3mm;
           border: 1mm solid #ddd;
           border-radius: 3mm;
