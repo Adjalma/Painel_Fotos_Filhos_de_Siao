@@ -121,12 +121,19 @@ export default function PainelFotos() {
       clone.style.transform = 'scale(1)';
       clone.style.width = '594mm';
       clone.style.height = '420mm';
-      clone.style.border = '6mm solid #FFF44F';
+      clone.style.border = 'none'; // Remover borda do clone, vamos desenhar no PDF
+      clone.style.overflow = 'visible';
+      // Garantir que elementos filhos não sejam cortados
+      const allChildren = clone.querySelectorAll('*');
+      allChildren.forEach((el: Element) => {
+        (el as HTMLElement).style.overflow = 'visible';
+      });
       document.body.appendChild(clone);
 
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Capturar apenas o layout (sem fotos) em alta qualidade
+      // Adicionar windowWidth e windowHeight para evitar clipping
       const layoutCanvas = await html2canvas(clone, {
         scale: 3,
         useCORS: true,
@@ -135,6 +142,10 @@ export default function PainelFotos() {
         width: clone.offsetWidth,
         height: clone.offsetHeight,
         allowTaint: true,
+        windowWidth: clone.scrollWidth,
+        windowHeight: clone.scrollHeight,
+        x: 0,
+        y: 0,
       });
 
       // Remover clone
@@ -148,7 +159,12 @@ export default function PainelFotos() {
         compress: false,
       });
 
-      // Adicionar layout ao PDF
+      // Desenhar borda amarela diretamente no PDF (6mm)
+      pdf.setDrawColor(255, 244, 79); // #FFF44F
+      pdf.setLineWidth(6);
+      pdf.rect(0, 0, 594, 420, 'S'); // Desenhar retângulo como borda
+
+      // Adicionar layout ao PDF (sem borda, pois já desenhamos)
       const layoutData = layoutCanvas.toDataURL('image/png', 1.0);
       pdf.addImage(layoutData, 'PNG', 0, 0, 594, 420, undefined, 'FAST');
 
@@ -167,30 +183,34 @@ export default function PainelFotos() {
         const containerRect = container.getBoundingClientRect();
         const fotoRect = foto.getBoundingClientRect();
         
-        // Calcular área interna da foto (sem bordas de 4mm)
+        // Calcular posição da foto no PDF (considerando borda de 4mm)
         const borderWidth = 4; // 4mm de borda
-        const internalX = ((fotoRect.left - painelRect.left) / painelRect.width) * 594 + borderWidth;
-        const internalY = ((fotoRect.top - painelRect.top) / painelRect.height) * 420 + borderWidth;
-        let internalWidth = (fotoRect.width / painelRect.width) * 594 - (borderWidth * 2);
-        let internalHeight = (fotoRect.height / painelRect.height) * 420 - (borderWidth * 2);
+        const fotoX = ((fotoRect.left - painelRect.left) / painelRect.width) * 594;
+        const fotoY = ((fotoRect.top - painelRect.top) / painelRect.height) * 420;
+        let fotoWidth = (fotoRect.width / painelRect.width) * 594;
+        let fotoHeight = (fotoRect.height / painelRect.height) * 420;
+        
+        // Área interna (sem bordas) para calcular o aumento
+        const internalWidth = fotoWidth - (borderWidth * 2);
+        const internalHeight = fotoHeight - (borderWidth * 2);
         
         // Aumentar fotos em 25% (mantendo proporção e centralizando)
         const widthIncrease = internalWidth * 0.25;
         const heightIncrease = internalHeight * 0.25;
-        internalWidth = internalWidth + widthIncrease;
-        internalHeight = internalHeight + heightIncrease;
+        const finalWidth = internalWidth + widthIncrease;
+        const finalHeight = internalHeight + heightIncrease;
         
-        // Centralizar a foto aumentada dentro da área interna
+        // Centralizar a foto aumentada dentro do container (considerando borda)
         const xOffset = widthIncrease / 2;
         const yOffset = heightIncrease / 2;
         
         // Adicionar TODAS as fotos que têm imagem (garantir ordem correta)
         if (fotos[index]?.src) {
           fotoPositions.push({
-            x: internalX - xOffset, // centralizar dentro da área interna
-            y: internalY - yOffset,
-            width: internalWidth,
-            height: internalHeight,
+            x: fotoX + borderWidth - xOffset, // posição considerando borda e centralização
+            y: fotoY + borderWidth - yOffset,
+            width: finalWidth,
+            height: finalHeight,
             src: fotos[index].src,
             texto: fotos[index].texto || '',
           });
