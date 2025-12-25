@@ -163,31 +163,34 @@ export default function PainelFotos() {
         const rect = foto.getBoundingClientRect();
         const painelRect = painelElement.getBoundingClientRect();
         
-        // Calcular posição relativa ao painel em mm (sem bordas)
+        // Calcular posição do container (área disponível para foto + texto)
         const containerRect = container.getBoundingClientRect();
-        const x = ((containerRect.left - painelRect.left) / painelRect.width) * 594;
-        const y = ((containerRect.top - painelRect.top) / painelRect.height) * 420;
-        let width = (containerRect.width / painelRect.width) * 594;
-        let height = (containerRect.height / painelRect.height) * 420;
+        const fotoRect = foto.getBoundingClientRect();
+        
+        // Calcular área interna da foto (sem bordas de 4mm)
+        const borderWidth = 4; // 4mm de borda
+        const internalX = ((fotoRect.left - painelRect.left) / painelRect.width) * 594 + borderWidth;
+        const internalY = ((fotoRect.top - painelRect.top) / painelRect.height) * 420 + borderWidth;
+        let internalWidth = (fotoRect.width / painelRect.width) * 594 - (borderWidth * 2);
+        let internalHeight = (fotoRect.height / painelRect.height) * 420 - (borderWidth * 2);
         
         // Aumentar fotos em 25% (mantendo proporção e centralizando)
-        const widthIncrease = width * 0.25;
-        const heightIncrease = height * 0.25;
-        width = width + widthIncrease;
-        height = height + heightIncrease;
+        const widthIncrease = internalWidth * 0.25;
+        const heightIncrease = internalHeight * 0.25;
+        internalWidth = internalWidth + widthIncrease;
+        internalHeight = internalHeight + heightIncrease;
         
-        // Centralizar a foto aumentada dentro do container
+        // Centralizar a foto aumentada dentro da área interna
         const xOffset = widthIncrease / 2;
         const yOffset = heightIncrease / 2;
         
         // Adicionar TODAS as fotos que têm imagem (garantir ordem correta)
-        // Remover bordas (4mm de cada lado = 8mm total) e ajustar posição
         if (fotos[index]?.src) {
           fotoPositions.push({
-            x: x - xOffset + 4, // centralizar considerando borda do container
-            y: y - yOffset + 4,
-            width: width - 8, // remover bordas (4mm cada lado)
-            height: height - 8,
+            x: internalX - xOffset, // centralizar dentro da área interna
+            y: internalY - yOffset,
+            width: internalWidth,
+            height: internalHeight,
             src: fotos[index].src,
             texto: fotos[index].texto || '',
           });
