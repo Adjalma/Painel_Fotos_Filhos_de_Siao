@@ -163,11 +163,12 @@ export default function PainelFotos() {
         const rect = foto.getBoundingClientRect();
         const painelRect = painelElement.getBoundingClientRect();
         
-        // Calcular posição relativa ao painel em mm
-        const x = ((rect.left - painelRect.left) / painelRect.width) * 594;
-        const y = ((rect.top - painelRect.top) / painelRect.height) * 420;
-        let width = (rect.width / painelRect.width) * 594;
-        let height = (rect.height / painelRect.height) * 420;
+        // Calcular posição relativa ao painel em mm (sem bordas)
+        const containerRect = container.getBoundingClientRect();
+        const x = ((containerRect.left - painelRect.left) / painelRect.width) * 594;
+        const y = ((containerRect.top - painelRect.top) / painelRect.height) * 420;
+        let width = (containerRect.width / painelRect.width) * 594;
+        let height = (containerRect.height / painelRect.height) * 420;
         
         // Aumentar fotos em 25% (mantendo proporção e centralizando)
         const widthIncrease = width * 0.25;
@@ -175,17 +176,18 @@ export default function PainelFotos() {
         width = width + widthIncrease;
         height = height + heightIncrease;
         
-        // Centralizar a foto aumentada
+        // Centralizar a foto aumentada dentro do container
         const xOffset = widthIncrease / 2;
         const yOffset = heightIncrease / 2;
         
         // Adicionar TODAS as fotos que têm imagem (garantir ordem correta)
+        // Remover bordas (4mm de cada lado = 8mm total) e ajustar posição
         if (fotos[index]?.src) {
           fotoPositions.push({
-            x: x - xOffset + 2, // centralizar e ajuste para borda interna
-            y: y - yOffset + 2,
-            width: width - 4, // remover bordas
-            height: height - 4,
+            x: x - xOffset + 4, // centralizar considerando borda do container
+            y: y - yOffset + 4,
+            width: width - 8, // remover bordas (4mm cada lado)
+            height: height - 8,
             src: fotos[index].src,
             texto: fotos[index].texto || '',
           });
@@ -484,7 +486,7 @@ export default function PainelFotos() {
           padding: 8mm 12mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 1fr 2fr 1fr;
+          grid-template-rows: 1fr 1.6fr 1fr;
           gap: 5mm;
           box-sizing: border-box;
           overflow: visible;
