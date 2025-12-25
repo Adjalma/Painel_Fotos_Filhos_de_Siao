@@ -104,7 +104,7 @@ export default function PainelFotos() {
       clone.style.transform = 'scale(1)';
       clone.style.width = '594mm';
       clone.style.height = '420mm';
-      clone.style.border = '6mm solid #FFF9C4';
+      clone.style.border = '6mm solid #FFECB3';
       document.body.appendChild(clone);
 
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -260,7 +260,7 @@ export default function PainelFotos() {
           font-family: Arial, sans-serif;
           padding: 20px;
           background: #2c3e50;
-          border: 10px solid #FFF9C4;
+          border: 10px solid #FFECB3;
           min-height: 100vh;
           box-sizing: border-box;
         }
@@ -275,7 +275,7 @@ export default function PainelFotos() {
         }
 
         .btn {
-          background: #FFF9C4;
+          background: #FFECB3;
           color: #000;
           border: none;
           padding: 15px 30px;
@@ -323,7 +323,7 @@ export default function PainelFotos() {
           max-height: 420mm;
           background: white;
           position: relative;
-          border: 6mm solid #FFF9C4;
+          border: 6mm solid #FFECB3;
           box-sizing: border-box;
           transform: scale(0.85);
           transform-origin: top center;
@@ -396,7 +396,7 @@ export default function PainelFotos() {
         }
 
         .top {
-          background: #FFF9C4;
+          background: #FFECB3;
           padding: 15mm 120mm 15mm 120mm;
           text-align: center;
           position: relative;
@@ -477,7 +477,7 @@ export default function PainelFotos() {
         }
 
         .foto:hover {
-          border-color: #FFF9C4;
+          border-color: #FFECB3;
         }
 
         .foto img {
@@ -592,16 +592,16 @@ export default function PainelFotos() {
             <div className="wm2">Filhos de Sião</div>
             <div className="wm3">MIR Macaé</div>
             <svg className="logo" viewBox="0 0 200 200">
-              <rect x="5" y="5" width="190" height="190" rx="15" fill="none" stroke="#FFF9C4" strokeWidth="9"/>
-              <rect x="14" y="14" width="172" height="172" rx="12" fill="none" stroke="#FFF9C4" strokeWidth="7"/>
-              <text x="100" y="70" fontFamily="Arial" fontSize="52" fontWeight="bold" fill="#FFF9C4" textAnchor="middle">M12</text>
-              <circle cx="100" cy="130" r="37" fill="none" stroke="#FFF9C4" strokeWidth="5"/>
-              <line x1="76" y1="130" x2="124" y2="130" stroke="#FFF9C4" strokeWidth="4"/>
-              <line x1="100" y1="106" x2="100" y2="154" stroke="#FFF9C4" strokeWidth="4"/>
-              <ellipse cx="100" cy="130" rx="37" ry="23" fill="none" stroke="#FFF9C4" strokeWidth="3.5"/>
-              <ellipse cx="100" cy="130" rx="23" ry="37" fill="none" stroke="#FFF9C4" strokeWidth="3.5"/>
-              <path d="M 23 174 Q 100 165 177 174" fill="none" stroke="#FFF9C4" strokeWidth="7"/>
-              <text x="100" y="192" fontFamily="Arial" fontSize="20" fontWeight="bold" fill="#FFF9C4" textAnchor="middle">MT 28:19</text>
+              <rect x="5" y="5" width="190" height="190" rx="15" fill="none" stroke="#FFECB3" strokeWidth="9"/>
+              <rect x="14" y="14" width="172" height="172" rx="12" fill="none" stroke="#FFECB3" strokeWidth="7"/>
+              <text x="100" y="70" fontFamily="Arial" fontSize="52" fontWeight="bold" fill="#FFECB3" textAnchor="middle">M12</text>
+              <circle cx="100" cy="130" r="37" fill="none" stroke="#FFECB3" strokeWidth="5"/>
+              <line x1="76" y1="130" x2="124" y2="130" stroke="#FFECB3" strokeWidth="4"/>
+              <line x1="100" y1="106" x2="100" y2="154" stroke="#FFECB3" strokeWidth="4"/>
+              <ellipse cx="100" cy="130" rx="37" ry="23" fill="none" stroke="#FFECB3" strokeWidth="3.5"/>
+              <ellipse cx="100" cy="130" rx="23" ry="37" fill="none" stroke="#FFECB3" strokeWidth="3.5"/>
+              <path d="M 23 174 Q 100 165 177 174" fill="none" stroke="#FFECB3" strokeWidth="7"/>
+              <text x="100" y="192" fontFamily="Arial" fontSize="20" fontWeight="bold" fill="#FFECB3" textAnchor="middle">MT 28:19</text>
             </svg>
           </div>
 
