@@ -114,6 +114,13 @@ export default function PainelFotos() {
         texto.remove();
       });
       
+      // Remover bordas das fotos no clone (não aparecerão no PDF)
+      const fotosNoClone = clone.querySelectorAll('.foto');
+      fotosNoClone.forEach((foto: Element) => {
+        (foto as HTMLElement).style.border = 'none';
+        (foto as HTMLElement).style.borderRadius = '0';
+      });
+      
       // Configurar clone para captura em tamanho real A2
       clone.style.position = 'fixed';
       clone.style.left = '-9999px';
