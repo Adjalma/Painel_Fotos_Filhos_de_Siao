@@ -232,9 +232,9 @@ export default function PainelFotos() {
             
             // Adicionar texto abaixo da foto se houver
             if (foto.texto && foto.texto.trim()) {
-              pdf.setFontSize(12);
+              pdf.setFontSize(14);
               pdf.setTextColor(0, 0, 0);
-              const textY = foto.y + foto.height + 4; // 4mm abaixo da foto
+              const textY = foto.y + foto.height + 3; // 3mm abaixo da foto
               const textX = foto.x + (foto.width / 2); // Centralizado
               
               // Quebrar texto em linhas se necessário
@@ -244,7 +244,7 @@ export default function PainelFotos() {
               // Desenhar texto centralizado
               lines.forEach((line: string, lineIndex: number) => {
                 const textWidth = pdf.getTextWidth(line);
-                pdf.text(line, textX - (textWidth / 2), textY + (lineIndex * 5));
+                pdf.text(line, textX - (textWidth / 2), textY + (lineIndex * 6));
               });
             }
           }
@@ -471,11 +471,11 @@ export default function PainelFotos() {
 
         .grid {
           height: calc(420mm - 100mm);
-          padding: 12mm 18mm;
+          padding: 10mm 15mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 1fr 1.5fr 1fr;
-          gap: 8mm;
+          grid-template-rows: 1fr 2fr 1fr;
+          gap: 6mm;
           box-sizing: border-box;
           overflow: visible;
         }
@@ -511,12 +511,12 @@ export default function PainelFotos() {
           border: 1mm solid #ddd;
           border-radius: 3mm;
           background: white;
-          font-size: 14pt;
+          font-size: 16pt;
           font-family: Arial, sans-serif;
           text-align: center;
           resize: none;
-          min-height: 15mm;
-          max-height: 35mm;
+          min-height: 16mm;
+          max-height: 40mm;
           overflow-y: auto;
           word-wrap: break-word;
           flex-shrink: 0;
