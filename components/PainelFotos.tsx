@@ -232,19 +232,19 @@ export default function PainelFotos() {
             
             // Adicionar texto abaixo da foto se houver
             if (foto.texto && foto.texto.trim()) {
-              pdf.setFontSize(8);
+              pdf.setFontSize(12);
               pdf.setTextColor(0, 0, 0);
-              const textY = foto.y + foto.height + 5; // 5mm abaixo da foto
+              const textY = foto.y + foto.height + 4; // 4mm abaixo da foto
               const textX = foto.x + (foto.width / 2); // Centralizado
               
               // Quebrar texto em linhas se necessário
-              const maxWidth = foto.width - 2;
+              const maxWidth = foto.width - 4;
               const lines = pdf.splitTextToSize(foto.texto, maxWidth);
               
               // Desenhar texto centralizado
               lines.forEach((line: string, lineIndex: number) => {
                 const textWidth = pdf.getTextWidth(line);
-                pdf.text(line, textX - (textWidth / 2), textY + (lineIndex * 4));
+                pdf.text(line, textX - (textWidth / 2), textY + (lineIndex * 5));
               });
             }
           }
