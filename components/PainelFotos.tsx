@@ -3,17 +3,18 @@ import { useState, useRef } from 'react';
 interface FotoState {
   src: string | null;
   file: File | null;
+  texto: string;
 }
 
 export default function PainelFotos() {
   const [fotos, setFotos] = useState<FotoState[]>([
-    { src: null, file: null },
-    { src: null, file: null },
-    { src: null, file: null },
-    { src: null, file: null },
-    { src: null, file: null },
-    { src: null, file: null },
-    { src: null, file: null },
+    { src: null, file: null, texto: '' },
+    { src: null, file: null, texto: '' },
+    { src: null, file: null, texto: '' },
+    { src: null, file: null, texto: '' },
+    { src: null, file: null, texto: '' },
+    { src: null, file: null, texto: '' },
+    { src: null, file: null, texto: '' },
   ]);
   const [mensagem, setMensagem] = useState<{ texto: string; tipo: 'ok' | 'err' } | null>(null);
   const [gerando, setGerando] = useState(false);
@@ -37,6 +38,7 @@ export default function PainelFotos() {
       newFotos[index] = {
         src: e.target?.result as string, // Usar imagem original diretamente
         file: file,
+        texto: newFotos[index].texto, // Manter texto existente
       };
       setFotos(newFotos);
       mostrarMensagem('Foto adicionada com sucesso!', 'ok');
@@ -45,9 +47,18 @@ export default function PainelFotos() {
     reader.readAsDataURL(file);
   };
 
+  const handleTextoChange = (index: number, texto: string) => {
+    const newFotos = [...fotos];
+    newFotos[index] = {
+      ...newFotos[index],
+      texto: texto,
+    };
+    setFotos(newFotos);
+  };
+
   const handleRemoveFoto = (index: number) => {
     const newFotos = [...fotos];
-    newFotos[index] = { src: null, file: null };
+    newFotos[index] = { src: null, file: null, texto: '' };
     setFotos(newFotos);
     if (fileInputsRef.current[index]) {
       fileInputsRef.current[index]!.value = '';
@@ -56,7 +67,7 @@ export default function PainelFotos() {
 
   const handleLimpar = () => {
     if (confirm('Deseja limpar todas as fotos?')) {
-      setFotos(fotos.map(() => ({ src: null, file: null })));
+      setFotos(fotos.map(() => ({ src: null, file: null, texto: '' })));
       fileInputsRef.current.forEach((input) => {
         if (input) input.value = '';
       });
@@ -104,7 +115,7 @@ export default function PainelFotos() {
       clone.style.transform = 'scale(1)';
       clone.style.width = '594mm';
       clone.style.height = '420mm';
-      clone.style.border = '6mm solid #FFC107';
+      clone.style.border = '6mm solid #FFF44F';
       document.body.appendChild(clone);
 
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -260,7 +271,7 @@ export default function PainelFotos() {
           font-family: Arial, sans-serif;
           padding: 20px;
           background: #2c3e50;
-          border: 10px solid #FFC107;
+          border: 10px solid #FFF44F;
           min-height: 100vh;
           box-sizing: border-box;
         }
@@ -275,7 +286,7 @@ export default function PainelFotos() {
         }
 
         .btn {
-          background: #FFC107;
+          background: #FFF44F;
           color: #000;
           border: none;
           padding: 15px 30px;
@@ -323,7 +334,7 @@ export default function PainelFotos() {
           max-height: 420mm;
           background: white;
           position: relative;
-          border: 6mm solid #FFC107;
+          border: 6mm solid #FFF44F;
           box-sizing: border-box;
           transform: scale(0.85);
           transform-origin: top center;
@@ -396,7 +407,7 @@ export default function PainelFotos() {
         }
 
         .top {
-          background: #FFC107;
+          background: #FFF44F;
           padding: 15mm 120mm 15mm 120mm;
           text-align: center;
           position: relative;
@@ -457,6 +468,13 @@ export default function PainelFotos() {
           overflow: hidden;
         }
 
+        .foto-container {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          height: 100%;
+        }
+
         .foto {
           border: 4mm solid #ddd;
           border-radius: 8mm;
@@ -465,19 +483,41 @@ export default function PainelFotos() {
           cursor: pointer;
           overflow: hidden;
           width: 100%;
-          height: 100%;
+          flex: 1;
           min-height: 0;
           display: flex;
           align-items: center;
           justify-content: center;
         }
 
-        .foto.mid {
+        .foto-texto {
+          width: 100%;
+          margin-top: 3mm;
+          padding: 3mm;
+          border: 1mm solid #ddd;
+          border-radius: 4mm;
+          background: white;
+          font-size: 10pt;
+          font-family: Arial, sans-serif;
+          text-align: left;
+          resize: none;
+          min-height: 15mm;
+          max-height: 40mm;
+          overflow-y: auto;
+          word-wrap: break-word;
+        }
+
+        .foto-texto:focus {
+          outline: 2mm solid #FFF44F;
+          border-color: #FFF44F;
+        }
+
+        .foto-container.mid {
           grid-column: 1 / 4;
         }
 
         .foto:hover {
-          border-color: #FFC107;
+          border-color: #FFF44F;
         }
 
         .foto img {
@@ -592,16 +632,16 @@ export default function PainelFotos() {
             <div className="wm2">Filhos de Sião</div>
             <div className="wm3">MIR Macaé</div>
             <svg className="logo" viewBox="0 0 200 200">
-              <rect x="5" y="5" width="190" height="190" rx="15" fill="none" stroke="#FFC107" strokeWidth="9"/>
-              <rect x="14" y="14" width="172" height="172" rx="12" fill="none" stroke="#FFC107" strokeWidth="7"/>
-              <text x="100" y="70" fontFamily="Arial" fontSize="52" fontWeight="bold" fill="#FFC107" textAnchor="middle">M12</text>
-              <circle cx="100" cy="130" r="37" fill="none" stroke="#FFC107" strokeWidth="5"/>
-              <line x1="76" y1="130" x2="124" y2="130" stroke="#FFC107" strokeWidth="4"/>
-              <line x1="100" y1="106" x2="100" y2="154" stroke="#FFC107" strokeWidth="4"/>
-              <ellipse cx="100" cy="130" rx="37" ry="23" fill="none" stroke="#FFC107" strokeWidth="3.5"/>
-              <ellipse cx="100" cy="130" rx="23" ry="37" fill="none" stroke="#FFC107" strokeWidth="3.5"/>
-              <path d="M 23 174 Q 100 165 177 174" fill="none" stroke="#FFC107" strokeWidth="7"/>
-              <text x="100" y="192" fontFamily="Arial" fontSize="20" fontWeight="bold" fill="#FFC107" textAnchor="middle">MT 28:19</text>
+              <rect x="5" y="5" width="190" height="190" rx="15" fill="none" stroke="#FFF44F" strokeWidth="9"/>
+              <rect x="14" y="14" width="172" height="172" rx="12" fill="none" stroke="#FFF44F" strokeWidth="7"/>
+              <text x="100" y="70" fontFamily="Arial" fontSize="52" fontWeight="bold" fill="#FFF44F" textAnchor="middle">M12</text>
+              <circle cx="100" cy="130" r="37" fill="none" stroke="#FFF44F" strokeWidth="5"/>
+              <line x1="76" y1="130" x2="124" y2="130" stroke="#FFF44F" strokeWidth="4"/>
+              <line x1="100" y1="106" x2="100" y2="154" stroke="#FFF44F" strokeWidth="4"/>
+              <ellipse cx="100" cy="130" rx="37" ry="23" fill="none" stroke="#FFF44F" strokeWidth="3.5"/>
+              <ellipse cx="100" cy="130" rx="23" ry="37" fill="none" stroke="#FFF44F" strokeWidth="3.5"/>
+              <path d="M 23 174 Q 100 165 177 174" fill="none" stroke="#FFF44F" strokeWidth="7"/>
+              <text x="100" y="192" fontFamily="Arial" fontSize="20" fontWeight="bold" fill="#FFF44F" textAnchor="middle">MT 28:19</text>
             </svg>
           </div>
 
@@ -627,39 +667,51 @@ export default function PainelFotos() {
               {fotos.map((foto, index) => (
                 <div
                   key={index}
-                  className={`foto ${index === 3 ? 'mid' : ''}`}
+                  className={`foto-container ${index === 3 ? 'mid' : ''}`}
                   data-i={index}
-                  onClick={() => fileInputsRef.current[index]?.click()}
                 >
-                  {foto.src ? (
-                    <img src={foto.src} alt={`Foto ${index + 1}`} />
-                  ) : (
-                    <div className="ph">
-                      <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                      </svg>
-                      {index === 3 ? 'Foto 4 - DESTAQUE' : `Foto ${index + 1}`}
-                    </div>
-                  )}
-                  <button
-                    className="rm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFoto(index);
-                    }}
+                  <div
+                    className="foto"
+                    onClick={() => fileInputsRef.current[index]?.click()}
                   >
-                    ×
-                  </button>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={(el) => {
-                      fileInputsRef.current[index] = el;
-                    }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] || null;
-                      handleFileSelect(index, file);
-                    }}
+                    {foto.src ? (
+                      <img src={foto.src} alt={`Foto ${index + 1}`} />
+                    ) : (
+                      <div className="ph">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                        {index === 3 ? 'Foto 4 - DESTAQUE' : `Foto ${index + 1}`}
+                      </div>
+                    )}
+                    <button
+                      className="rm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFoto(index);
+                      }}
+                    >
+                      ×
+                    </button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={(el) => {
+                        fileInputsRef.current[index] = el;
+                      }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        handleFileSelect(index, file);
+                      }}
+                    />
+                  </div>
+                  <textarea
+                    className="foto-texto"
+                    placeholder={`Legenda para Foto ${index + 1}...`}
+                    value={foto.texto}
+                    onChange={(e) => handleTextoChange(index, e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    onFocus={(e) => e.stopPropagation()}
                   />
                 </div>
               ))}
