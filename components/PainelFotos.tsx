@@ -152,11 +152,14 @@ export default function PainelFotos() {
       const layoutData = layoutCanvas.toDataURL('image/png', 1.0);
       pdf.addImage(layoutData, 'PNG', 0, 0, 594, 420, undefined, 'FAST');
 
-      // Obter posições das fotos no painel (agora usando .foto dentro de .foto-container)
-      const fotoElements = painelElement.querySelectorAll('.foto-container .foto');
+      // Obter posições das fotos no painel (usando .foto-container para pegar todas as 7)
+      const fotoContainers = painelElement.querySelectorAll('.foto-container');
       const fotoPositions: Array<{ x: number; y: number; width: number; height: number; src: string; texto: string }> = [];
       
-      fotoElements.forEach((foto, index) => {
+      fotoContainers.forEach((container, index) => {
+        const foto = container.querySelector('.foto');
+        if (!foto) return;
+        
         const rect = foto.getBoundingClientRect();
         const painelRect = painelElement.getBoundingClientRect();
         
@@ -166,6 +169,7 @@ export default function PainelFotos() {
         const width = (rect.width / painelRect.width) * 594;
         const height = (rect.height / painelRect.height) * 420;
         
+        // Adicionar TODAS as fotos que têm imagem (garantir ordem correta)
         if (fotos[index]?.src) {
           fotoPositions.push({
             x: x + 4, // ajuste para borda interna
