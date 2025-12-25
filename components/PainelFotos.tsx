@@ -166,16 +166,26 @@ export default function PainelFotos() {
         // Calcular posição relativa ao painel em mm
         const x = ((rect.left - painelRect.left) / painelRect.width) * 594;
         const y = ((rect.top - painelRect.top) / painelRect.height) * 420;
-        const width = (rect.width / painelRect.width) * 594;
-        const height = (rect.height / painelRect.height) * 420;
+        let width = (rect.width / painelRect.width) * 594;
+        let height = (rect.height / painelRect.height) * 420;
+        
+        // Aumentar fotos em 25% (mantendo proporção e centralizando)
+        const widthIncrease = width * 0.25;
+        const heightIncrease = height * 0.25;
+        width = width + widthIncrease;
+        height = height + heightIncrease;
+        
+        // Centralizar a foto aumentada
+        const xOffset = widthIncrease / 2;
+        const yOffset = heightIncrease / 2;
         
         // Adicionar TODAS as fotos que têm imagem (garantir ordem correta)
         if (fotos[index]?.src) {
           fotoPositions.push({
-            x: x + 4, // ajuste para borda interna
-            y: y + 4,
-            width: width - 8, // remover bordas
-            height: height - 8,
+            x: x - xOffset + 2, // centralizar e ajuste para borda interna
+            y: y - yOffset + 2,
+            width: width - 4, // remover bordas
+            height: height - 4,
             src: fotos[index].src,
             texto: fotos[index].texto || '',
           });
@@ -234,7 +244,7 @@ export default function PainelFotos() {
             if (foto.texto && foto.texto.trim()) {
               pdf.setFontSize(14);
               pdf.setTextColor(0, 0, 0);
-              const textY = foto.y + foto.height + 3; // 3mm abaixo da foto
+              const textY = foto.y + foto.height + 8; // 8mm abaixo da foto (mais espaçamento)
               const textX = foto.x + (foto.width / 2); // Centralizado
               
               // Quebrar texto em linhas se necessário
@@ -471,11 +481,11 @@ export default function PainelFotos() {
 
         .grid {
           height: calc(420mm - 100mm);
-          padding: 10mm 15mm;
+          padding: 8mm 12mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
           grid-template-rows: 1fr 2fr 1fr;
-          gap: 6mm;
+          gap: 5mm;
           box-sizing: border-box;
           overflow: visible;
         }
