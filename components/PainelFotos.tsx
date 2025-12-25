@@ -278,7 +278,10 @@ export default function PainelFotos() {
             if (foto.texto && foto.texto.trim()) {
               pdf.setFontSize(14);
               pdf.setTextColor(0, 0, 0);
-              const textY = foto.y + foto.height + 8; // 8mm abaixo da foto (mais espaçamento)
+              // Mais espaçamento para foto central (index 3)
+              const fotoIndex = fotoPositions.indexOf(foto);
+              const spacing = fotoIndex === 3 ? 10 : 8; // 10mm para foto central, 8mm para outras
+              const textY = foto.y + foto.height + spacing;
               const textX = foto.x + (foto.width / 2); // Centralizado
               
               // Quebrar texto em linhas se necessário
@@ -564,6 +567,10 @@ export default function PainelFotos() {
           overflow-y: auto;
           word-wrap: break-word;
           flex-shrink: 0;
+        }
+
+        .foto-container.mid .foto-texto {
+          margin-top: 6mm; /* Mais espaçamento para foto central */
         }
 
         .foto-texto:focus {
