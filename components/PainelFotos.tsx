@@ -183,23 +183,18 @@ export default function PainelFotos() {
         const containerRect = container.getBoundingClientRect();
         const fotoRect = foto.getBoundingClientRect();
         
-        // Calcular posição e tamanho da área interna (sem bordas de 4mm)
-        const borderWidth = 4; // 4mm de borda
+        // Calcular posição e tamanho do container (SEM bordas no PDF)
         const containerX = ((containerRect.left - painelRect.left) / painelRect.width) * 594;
         const containerY = ((containerRect.top - painelRect.top) / painelRect.height) * 420;
         const containerWidth = (containerRect.width / painelRect.width) * 594;
         const containerHeight = (containerRect.height / painelRect.height) * 420;
         
-        // Área interna da foto (sem bordas e sem espaço do texto)
+        // Área disponível para foto (sem espaço do texto)
         const textoHeight = 20; // altura aproximada da caixa de texto em mm
-        const internalWidth = containerWidth;
-        const internalHeight = containerHeight - textoHeight - 4; // 4mm de margin-top
+        const fotoAreaWidth = containerWidth;
+        const fotoAreaHeight = containerHeight - textoHeight - 4; // 4mm de margin-top
         
-        // Calcular área da foto dentro do container (considerando borda de 4mm)
-        const fotoAreaWidth = internalWidth - (borderWidth * 2);
-        const fotoAreaHeight = internalHeight - (borderWidth * 2);
-        
-        // Aumentar área da foto em 25% (mas respeitando os limites)
+        // Aumentar área da foto em 25% (usando toda a área disponível)
         const widthIncrease = fotoAreaWidth * 0.25;
         const heightIncrease = fotoAreaHeight * 0.25;
         const finalWidth = fotoAreaWidth + widthIncrease;
@@ -212,8 +207,8 @@ export default function PainelFotos() {
         // Adicionar TODAS as fotos que têm imagem (garantir ordem correta)
         if (fotos[index]?.src) {
           fotoPositions.push({
-            x: containerX + borderWidth - xOffset, // posição dentro do container, centralizada
-            y: containerY + borderWidth - yOffset,
+            x: containerX - xOffset, // posição centralizada, sem bordas
+            y: containerY - yOffset,
             width: finalWidth,
             height: finalHeight,
             src: fotos[index].src,
