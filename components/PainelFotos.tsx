@@ -467,13 +467,13 @@ export default function PainelFotos() {
 
         .top {
           background: #FFF44F;
-          padding: 15mm 120mm 15mm 120mm;
+          padding: 12mm 120mm 12mm 120mm;
           text-align: center;
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 100mm;
+          height: 85mm;
           box-sizing: border-box;
         }
 
@@ -517,7 +517,7 @@ export default function PainelFotos() {
         }
 
         .grid {
-          height: calc(420mm - 100mm);
+          height: calc(420mm - 85mm);
           padding: 8mm 12mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
