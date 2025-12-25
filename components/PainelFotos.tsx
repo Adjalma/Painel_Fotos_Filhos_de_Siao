@@ -467,13 +467,13 @@ export default function PainelFotos() {
 
         .grid {
           height: calc(420mm - 100mm);
-          padding: 15mm 20mm;
+          padding: 12mm 18mm;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 1fr 1.6fr 1fr;
-          gap: 10mm;
+          grid-template-rows: 1fr 1.5fr 1fr;
+          gap: 8mm;
           box-sizing: border-box;
-          overflow: hidden;
+          overflow: visible;
         }
 
         .foto-container {
@@ -481,6 +481,8 @@ export default function PainelFotos() {
           flex-direction: column;
           width: 100%;
           height: 100%;
+          min-height: 0;
+          overflow: visible;
         }
 
         .foto {
@@ -500,19 +502,20 @@ export default function PainelFotos() {
 
         .foto-texto {
           width: 100%;
-          margin-top: 3mm;
-          padding: 3mm;
+          margin-top: 2mm;
+          padding: 2mm;
           border: 1mm solid #ddd;
-          border-radius: 4mm;
+          border-radius: 3mm;
           background: white;
-          font-size: 10pt;
+          font-size: 9pt;
           font-family: Arial, sans-serif;
           text-align: center;
           resize: none;
-          min-height: 15mm;
-          max-height: 40mm;
+          min-height: 12mm;
+          max-height: 30mm;
           overflow-y: auto;
           word-wrap: break-word;
+          flex-shrink: 0;
         }
 
         .foto-texto:focus {
