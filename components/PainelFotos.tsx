@@ -662,7 +662,7 @@ export default function PainelFotos() {
               />
               <div className="top-content">
                 <h1>FILHOS DE SIÃO</h1>
-                <p>Quero trazer à memória o que me pode dar esperança — Lamentações 3:21</p>
+                <p>Quero trazer à memória o que me pode dar esperança Lamentações 3:21</p>
               </div>
               <img
                 src="/m12.png"
