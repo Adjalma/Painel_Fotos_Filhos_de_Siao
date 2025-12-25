@@ -108,6 +108,12 @@ export default function PainelFotos() {
         img.remove();
       });
       
+      // Remover caixas de texto do clone (serão adicionadas depois no PDF)
+      const fotoTextos = clone.querySelectorAll('.foto-texto');
+      fotoTextos.forEach((texto) => {
+        texto.remove();
+      });
+      
       // Configurar clone para captura em tamanho real A2
       clone.style.position = 'fixed';
       clone.style.left = '-9999px';
@@ -146,44 +152,28 @@ export default function PainelFotos() {
       const layoutData = layoutCanvas.toDataURL('image/png', 1.0);
       pdf.addImage(layoutData, 'PNG', 0, 0, 594, 420, undefined, 'FAST');
 
-      // Obter posições das fotos no painel
-      const fotoElements = painelElement.querySelectorAll('.foto');
-      const fotoPositions: Array<{ x: number; y: number; width: number; height: number; src: string }> = [];
-      
-      // Obter dimensões reais do painel em mm
-      const painelWidthMM = 594;
-      const painelHeightMM = 420;
-      const topHeightMM = 100; // altura da área amarela
-      const gridPaddingMM = 20; // padding do grid
-      const gridGapMM = 10; // gap entre fotos
-      const fotoBorderMM = 4; // borda das fotos
-      
-      // Calcular dimensões do grid
-      const gridWidthMM = painelWidthMM - (gridPaddingMM * 2);
-      const gridHeightMM = painelHeightMM - topHeightMM - (gridPaddingMM * 2);
-      
-      // Calcular tamanho das fotos no grid
-      const fotoWidthSmall = (gridWidthMM - (gridGapMM * 2)) / 3;
-      const fotoHeightSmall = (gridHeightMM - (gridGapMM * 2) - (gridHeightMM * 0.6 / 1.6)) / 2;
-      const fotoHeightLarge = gridHeightMM * 0.6;
+      // Obter posições das fotos no painel (agora usando .foto dentro de .foto-container)
+      const fotoElements = painelElement.querySelectorAll('.foto-container .foto');
+      const fotoPositions: Array<{ x: number; y: number; width: number; height: number; src: string; texto: string }> = [];
       
       fotoElements.forEach((foto, index) => {
         const rect = foto.getBoundingClientRect();
         const painelRect = painelElement.getBoundingClientRect();
         
-        // Calcular posição relativa ao painel em mm (mais preciso)
-        const x = ((rect.left - painelRect.left) / painelRect.width) * painelWidthMM;
-        const y = ((rect.top - painelRect.top) / painelRect.height) * painelHeightMM;
-        const width = (rect.width / painelRect.width) * painelWidthMM;
-        const height = (rect.height / painelRect.height) * painelHeightMM;
+        // Calcular posição relativa ao painel em mm
+        const x = ((rect.left - painelRect.left) / painelRect.width) * 594;
+        const y = ((rect.top - painelRect.top) / painelRect.height) * 420;
+        const width = (rect.width / painelRect.width) * 594;
+        const height = (rect.height / painelRect.height) * 420;
         
         if (fotos[index]?.src) {
           fotoPositions.push({
-            x: x + fotoBorderMM, // ajuste para borda interna
-            y: y + fotoBorderMM,
-            width: width - (fotoBorderMM * 2), // remover bordas
-            height: height - (fotoBorderMM * 2),
+            x: x + 4, // ajuste para borda interna
+            y: y + 4,
+            width: width - 8, // remover bordas
+            height: height - 8,
             src: fotos[index].src,
+            texto: fotos[index].texto || '',
           });
         }
       });
@@ -499,7 +489,7 @@ export default function PainelFotos() {
           background: white;
           font-size: 10pt;
           font-family: Arial, sans-serif;
-          text-align: left;
+          text-align: center;
           resize: none;
           min-height: 15mm;
           max-height: 40mm;
